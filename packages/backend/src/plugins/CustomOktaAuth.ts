@@ -32,6 +32,12 @@ export const customOktaAuth = createBackendModule({
                 }
                 // Split the email into the local part and the domain.
                 const [localPart] = email.split('@');
+
+                let fullProfileJson = (info.result.fullProfile as any)._json;
+                let departmentName = "";
+                if(fullProfileJson.department) {
+                  departmentName = fullProfileJson.department.replace('/[^a-zA-Z0-9]/g','-').replace('/-+/g','-').substring(1,62).toLowerCase();
+                }
             
                 // By using `stringifyEntityRef` we ensure that the reference is formatted correctly
                 const userEntity = stringifyEntityRef({
@@ -42,7 +48,7 @@ export const customOktaAuth = createBackendModule({
                 return ctx.issueToken({
                     claims: {
                         sub: userEntity,
-                        ent: [userEntity],
+                        ent: ["group:" + departmentName],
                     },
                 });
             },
